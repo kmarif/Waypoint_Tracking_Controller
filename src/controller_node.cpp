@@ -39,7 +39,7 @@ double max_steer_angle= 1.0472;
 double A[4],B[2],Q[4],R,Kr[2];
 //Delay compensation variables
 double buffer_vel[2][N_RET_VEL_MAX];
-double evol_vel[2][N_RET_VEL_MAX]; //fila 1 v, fila 2 ro 
+double evol_vel[2][N_RET_VEL_MAX]; //row 1 v, row 2 ro 
 
 int n_tramo = 0, cambia_tramo=0, n_tramos = 0;
 int init=0, init_odom=0;
@@ -93,7 +93,7 @@ void trajectoryCallback(const boost::shared_ptr<nav_msgs::Path const>& msg)
 	 int m=msg->poses.size(), j=1; 
          int n_puntos=0;
 	 double dist;
-  	 double x[m], y[m], o[2];  //m será el número máximo de puntos si los cogiéramos todos. 
+  	 double x[m], y[m], o[2];  //m will be the maximum number of points if we took them all. 
 	 double u_interpol[10] = {0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9};  //Sacaremos 10 puntos por tramo
 	 nav_msgs::Path spline_path;
 	 geometry_msgs::PoseStamped posicion;
@@ -107,11 +107,11 @@ void trajectoryCallback(const boost::shared_ptr<nav_msgs::Path const>& msg)
 	 points_spline.scale.y=0.1;
 	 points_spline.scale.z=0.1;
 
-         //ROS_INFO("Callback de trayectoria con init_odom=%d", init_odom);
+         //ROS_INFO("Callback of trajectory with init_odom=%d", init_odom);
     		
 	if (init_odom==0) return;
 
-        //Si la trayectoria no ha cambiado, nos salimos para no volver a calcularla
+        //If the trajectory has not changed, we exit so as not to recalculate it
 	 x_fin = msg->poses[m-1].pose.position.x;
 	 y_fin = msg->poses[m-1].pose.position.y;
 	
@@ -129,8 +129,7 @@ void trajectoryCallback(const boost::shared_ptr<nav_msgs::Path const>& msg)
 	u=0.5; u_ant=0.5;
 	points_spline.points.clear();
 
-	//New trajectory defined	 
-	 	
+	//New trajectory defined	 	
 
 	//The actual position of the vehicle is the initial point of the trajectory
 
@@ -328,36 +327,36 @@ void timerCallback(const ros::TimerEvent& e)
 	de_pub.publish(de_msg);
 	oe_pub.publish(oe_msg);
 
-	if (u>0.5) //Segunda mitad del tramo, vamos suavizando hacia la velocidad del tramo siguiente
+	if (u>0.5) //Second half of the section, we are smoothing towards the speed of the next section
 	{
 		v=arrayVel[n_tramo]+(u-0.5)*(arrayVel[n_tramo+1]-arrayVel[n_tramo]);
 	}
-	else //Primera mitad del tramo, vamos suavizando desde la velocidad del tramo anterior
+	else //First half of the section, we are smoothing from the speed of the previous section
 	{
 		v=arrayVel[n_tramo-1]+(u+0.5)*(arrayVel[n_tramo]-arrayVel[n_tramo-1]);
 	}
 
-	//Primer tramo
+	//First section
 	if(n_tramo<3)
 	{
-		if (u>0.5) //Segunda mitad del tramo, vamos suavizando hacia la velocidad del tramo siguiente
+		if (u>0.5) //Second half of the section, we are smoothing towards the speed of the next section
 		{
 			v=arrayVel[n_tramo]*(n_tramo+1)/3+(u-0.5)*(arrayVel[n_tramo+1]*(n_tramo+2)/3-arrayVel[n_tramo]*(n_tramo+1)/3);
 		}
-		else //Primera mitad del tramo, vamos suavizando desde la velocidad del tramo anterior
+		else //First half of the section, we are smoothing from the speed of the previous section
 		{
 			v=arrayVel[n_tramo-1]*(n_tramo)/3+(u+0.5)*(arrayVel[n_tramo]*(n_tramo+1)/3-arrayVel[n_tramo-1]*(n_tramo)/3);
 		}
 	}
 
-	//Ultimo tramo
+	//Last section
 	else if(n_tramo>(n_tramos-3))
 	{
-		if (u>0.5) //Segunda mitad del tramo, vamos suavizando hacia la velocidad del tramo siguiente
+		if (u>0.5) //Second half of the section, we are smoothing towards the speed of the next section
 		{
 			v=arrayVel[n_tramo]*(n_tramos-n_tramo)/3+(u-0.5)*(arrayVel[n_tramo+1]*((n_tramos-n_tramo)-1)/3-arrayVel[n_tramo]*(n_tramos-n_tramo)/3);
 		}
-		else //Primera mitad del tramo, vamos suavizando desde la velocidad del tramo anterior
+		else //First half of the section, we are smoothing from the speed of the previous section
 		{
 			v=arrayVel[n_tramo-1]*((n_tramos-n_tramo)+1)/3+(u+0.5)*(arrayVel[n_tramo]*(n_tramos-n_tramo)/3-arrayVel[n_tramo-1]*((n_tramos-n_tramo)+1)/3);
 		}
@@ -402,7 +401,7 @@ void timerCallback(const ros::TimerEvent& e)
 	speed_pub.publish(speed_msg);
 	steer_pub.publish(steer_msg);
 
-	//GUARDAMOS VELOCIDADES EN EL BUFFER DE VELOCIDADES
+	//WE SAVE SPEEDS IN THE SPEED BUFFER
 	for (int i=1; i<n_ret_vel; i++)
 	{
 		evol_vel[0][i-1]=evol_vel[0][i];
@@ -478,7 +477,7 @@ int main(int argc, char **argv)
 }
 
 
-//*******************************CALCULA COEFICIENTES DE LA SPLINE***************************************//
+//*******************************CALCULATE SPLINE COEFFICIENTS***************************************//
 
 void n_spline(double *x, double *y, double *o, double nu, int m)
 
@@ -560,7 +559,7 @@ void n_spline(double *x, double *y, double *o, double nu, int m)
 
 }
 
-//*****************CALCULA CONSIGNA***************************//
+//*****************CALCULATES SETPOINT***************************//
 
 void calcula_consigna(double actualPose[3],double coefs[n_max][8],int n_tramo)
 
@@ -622,7 +621,7 @@ void calcula_consigna(double actualPose[3],double coefs[n_max][8],int n_tramo)
 
 }
 
-//******************RESOLUCIÓN DE ECUACIÓN****************//
+//******************EQUATION SOLVING****************//
 
 float sol_ecuacion(float coef[6], float x)
 {
@@ -671,7 +670,7 @@ float sol_ecuacion(float coef[6], float x)
 	
 }
 
-//********************LIMITA ANGULO ENTRE +-PI****************//
+//********************LIMIT ANGLE BETWEEN +-PI****************//
 
 double Limitang( double ang )
 {
@@ -690,29 +689,29 @@ void Dlqr(double K[2], double A[4], double B[2], double Q[4], double R)
 	double transA[4], BRB[4], modif[4], inter0[1];
 	int ind;
 
-	//Precalculo de elementos que no cambian durante el bucle como la transpuesta de A y B*inv(R)*B
+	//Precalculation of elements that do not change during the loop, such as the transpose of A and B*inv(R)*B
 
 	Traspuesta2(A,transA);
 	mult_esc_mat(1/R,B,num_est,inter1);
 	Multiplicar(B,inter1,num_est,1,num_est,BRB);
 
-	//Bucle para calculo de P0 hasta que se estabilice (20 veces)
+	//Loop to calculate P0 until it stabilizes (20 times)
 	
 	for(ind=0;ind<20;ind++)
 	{
-		//Multiplicamos BRB*P0 y lo guardamos en inter3
+		//We multiply BRB*P0 and store it in inter3
 		Multiplicar(BRB,P0,num_est,num_est,num_est,inter3);
-		//Sumamos la matriz identidad con el inter3 guardandolo en inter3
+		//We add the identity matrix with the inter3 saving it in inter3
 		suma_ident(inter3,num_est);
-		//Inversa de inter3 y guardamos en modif
+		//Inverse of inter3 and we save in modif
 		Inversa2(inter3,modif);
-		//Multiplicamos modif*A y lo guardamos en inter3
+		//We multiply modif*A and store it in inter3
 		Multiplicar(modif,A,num_est,num_est,num_est,inter3);
-		//Multiplicamos P0*inter3 y se guarda en modif
+		//We multiply P0 * inter3 and save it in modif
 		Multiplicar(P0,inter3,num_est,num_est,num_est,modif);
-		//Multiplicamos trasA*modif y se guarda en P0
+		//We multiply trasA*modif and save it in P0
 		Multiplicar(transA,modif,num_est,num_est,num_est,P0);
-		//Sumar Q y P0 y ya tenemos P0 nuevo
+		//Add Q and P0 and we have new P0
 		Sumar(Q,P0,num_est,num_est,P0);	
 	}
 
@@ -729,7 +728,7 @@ void Dlqr(double K[2], double A[4], double B[2], double Q[4], double R)
 
 }
 
-//*******************************MULTIPLICACIÓN DE MATRICES*********************************//
+//*******************************MATRIX MULTIPLICATION*********************************//
 
 void Multiplicar(double *origen1, double *origen2, long x, long y, long z, double *destino)
 {
@@ -746,7 +745,7 @@ void Multiplicar(double *origen1, double *origen2, long x, long y, long z, doubl
 		}
 }
 
-//************************MULTIPLICACION ESCALAR POR MATRIZ*********************************//
+//************************SCALAR MULTIPLICATION BY MATRIX*********************************//
 
 void mult_esc_mat(double esc, double *mat, int n, double *destino)
 {
@@ -755,7 +754,7 @@ void mult_esc_mat(double esc, double *mat, int n, double *destino)
 		destino[i]=mat[i]*esc;
 }
 
-//********************SUMA A UNA MATRIZ LA MATRIZ IDENTIDAD*********************************//
+//********************ADDS THE IDENTITY MATRIX TO A MATRIX*********************************//
 
 void suma_ident(double *mat, int n)
 {
@@ -770,7 +769,7 @@ void suma_ident(double *mat, int n)
 	}
 }
 
-//*****************INVERSA DE UNA MATRIZ DE ORDEN 2**********************//
+//*****************INVERSE OF A MATRIX OF ORDER 2**********************//
 
 void Inversa2(double *origen, double *destino)
 {
@@ -783,7 +782,7 @@ void Inversa2(double *origen, double *destino)
 	destino[3]=origen[0]*inv_det;
 }
 
-//******************TRASPUESTA DE MATRIZ DE ORDEN 2*************************//
+//******************TRANSPOSE OF MATRIX OF ORDER 2*************************//
 
 void Traspuesta2(double *origen, double *destino)
 {
@@ -793,7 +792,7 @@ void Traspuesta2(double *origen, double *destino)
 		destino[i*2+j]=origen[j*2+i];
 }
 
-//*********************SUMA DE MATRICES********************************//
+//*********************SUM OF MATRICES********************************//
 
 void Sumar(double *origen1, double *origen2, int nf, int nc, double *destino)
 {
@@ -803,7 +802,7 @@ void Sumar(double *origen1, double *origen2, int nf, int nc, double *destino)
 		*(destino+i*nf+j)=(*(origen1+i*nf+j))+(*(origen2+i*nf+j));
 }
 
-//**********************APLICA LA LEY DE CONTROL OPTIMO PARA HAYAR ro=-K*x)**********************//
+//**********************APPLY THE LAW OF OPTIMAL CONTROL TO HAYAR ro=-K*x)**********************//
 
 void Consigna_ro(double de, double oe, double Kr[2], double *ro)		
 {
@@ -811,6 +810,6 @@ void Consigna_ro(double de, double oe, double Kr[2], double *ro)
 	estados[0]=de;
 	estados[1]=oe;
 	Multiplicar(Kr,estados,1L,2L,1L,ro);
-	//Inversion del signo de la velocidad obtenida
+	//Inversion of the sign of the speed obtained
 	*ro = -(*ro);
 }
