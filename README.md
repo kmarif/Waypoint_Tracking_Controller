@@ -12,7 +12,7 @@ A spline interpolator generates a smooth path and a speed profiler calculates fo
 
 ## Clone
 
-Clone this repo to your local machine using `https://github.com/RobeSafe-UAH/Waypoint_Tracking_Controller.git`
+Clone this repo to your local machine using `https://github.com/kmarif/Waypoint_Tracking_Controller.git`
 
 ## Quick Start
 
