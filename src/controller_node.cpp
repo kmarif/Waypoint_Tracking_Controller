@@ -424,17 +424,17 @@ int main(int argc, char **argv)
 	n.param<int>("/controller/min_dist",min_dist,10);
 	n.param<double>("/controller/rc_max",rc_max,20);
 	n.param<double>("/controller/rc_min",rc_min,1);
-    n.param<double>("/controller/v_max",v_max,10);
-    n.param<int>("/controller/n_ret_vel",n_ret_vel,2);
-    n.param<double>("/controller/sample_time",sample_time,0.1);
+    	n.param<double>("/controller/v_max",v_max,10);
+    	n.param<int>("/controller/n_ret_vel",n_ret_vel,2);
+    	n.param<double>("/controller/sample_time",sample_time,0.1);
 	n.param<double>("/controller/q11",q11,1);
 	n.param<double>("/controller/q22",q22,1);
 	n.param<double>("/controller/r11",r11,1);
 
 	ROS_INFO("\nPARAMETROS:");
 	ROS_INFO("\tN_max: %d",N_max);
-    ROS_INFO("\tmin_dist: %d",min_dist);
-    ROS_INFO("\trc_max: %lf",rc_max);
+    	ROS_INFO("\tmin_dist: %d",min_dist);
+    	ROS_INFO("\trc_max: %lf",rc_max);
 	ROS_INFO("\trc_min: %lf",rc_min);
  	ROS_INFO("\tv_max: %lf",v_max);
  	ROS_INFO("\tn_ret_vel: %d",n_ret_vel);
@@ -715,7 +715,7 @@ void Dlqr(double K[2], double A[4], double B[2], double Q[4], double R)
 		Sumar(Q,P0,num_est,num_est,P0);	
 	}
 
-	//Calculo de K
+	//Calculation of K
 
 	Multiplicar(B,P0,1,num_est,num_est,inter1);
 	Multiplicar(inter1,B,1,num_est,1,inter0);
